@@ -261,20 +261,52 @@
     .about-image-wrap {
       position: relative;
     }
-    .about-image-wrap img {
-      width: 100%; aspect-ratio: 3/4; object-fit: cover;
+    .apt-carousel {
+      position: relative;
+      overflow: hidden;
       border-radius: var(--radius);
+      aspect-ratio: 3/4;
+      background: var(--cream);
     }
-    .about-image-accent {
-      position: absolute;
-      bottom: -20px; right: -20px;
-      width: 60%;
-      aspect-ratio: 1;
+    .apt-carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.4s ease;
+    }
+    .apt-carousel-track img {
+      min-width: 100%;
+      height: 100%;
       object-fit: cover;
-      border-radius: var(--radius);
-      border: 4px solid var(--warm-white);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      flex-shrink: 0;
     }
+    .apt-prev, .apt-next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(253,251,247,0.85);
+      border: 1px solid var(--border);
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .apt-prev { left: 10px; }
+    .apt-next { right: 10px; }
+    .apt-prev:hover, .apt-next:hover { background: rgba(253,251,247,1); }
+    .apt-dots {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 5px; z-index: 2;
+    }
+    .apt-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .apt-dot.active { background: #fff; }
     .about-text { padding-right: 20px; }
     .section-label {
       font-size: 0.72rem;
@@ -755,8 +787,19 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-image-wrap">
-          <img src="assets/bedroom-overview-2.jpeg" alt="Bedroom with desk and wardrobe" />
-          <img src="assets/bathroom-overview.jpeg" alt="Private bathroom" class="about-image-accent" />
+          <div class="apt-carousel">
+            <div class="apt-carousel-track" id="apt-track">
+              <img src="assets/title-bed-bedroom.jpeg"      alt="Bedroom with double bed" />
+              <img src="assets/bedroom-overview-1.jpeg"     alt="Bedroom overview" />
+              <img src="assets/bedroom-detail-paintings.jpeg" alt="Bedroom detail" />
+              <img src="assets/kitchen-1.jpeg"              alt="Fully equipped kitchen" />
+              <img src="assets/bathroom-overview.jpeg"      alt="Private bathroom" />
+              <img src="assets/toilet-1.jpeg"               alt="Separate WC" />
+            </div>
+            <button class="apt-prev" id="apt-prev" aria-label="Previous photo">←</button>
+            <button class="apt-next" id="apt-next" aria-label="Next photo">→</button>
+            <div class="apt-dots" id="apt-dots"></div>
+          </div>
         </div>
         <div class="about-text">
           <span class="section-label">The Space</span>
@@ -1019,21 +1062,21 @@
   <!-- ─── JS: Calendar ─────────────────────────────────────── -->
   <script>
     // Fetch availability.json (same folder as index.html)
-    // Structure: { "unavailable": [{ "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }] }
+    // Structure: { "available": [{ "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }] }
 
     const DAYS = ['Mo','Tu','We','Th','Fr','Sa','Su'];
     const MONTHS = ['January','February','March','April','May','June',
                     'July','August','September','October','November','December'];
 
-    let unavailableRanges = [];
+    let availableRanges = [];
 
     function parseDate(str) {
       const [y,m,d] = str.split('-').map(Number);
       return new Date(y, m-1, d);
     }
 
-    function isUnavailable(date) {
-      return unavailableRanges.some(r => date >= r.from && date <= r.to);
+    function isAvailable(date) {
+      return availableRanges.some(r => date >= r.from && date <= r.to);
     }
 
     function isToday(date) {
@@ -1051,7 +1094,6 @@
     function renderMonth(year, month) {
       const firstDay = new Date(year, month, 1);
       const lastDay  = new Date(year, month+1, 0);
-      // Monday-first offset
       let startOffset = (firstDay.getDay() + 6) % 7;
 
       let html = `<div class="month-calendar">
@@ -1069,10 +1111,10 @@
       for (let d = 1; d <= lastDay.getDate(); d++) {
         const date = new Date(year, month, d);
         let cls = 'cal-day';
-        if (isPast(date))         cls += ' past';
-        else if (isToday(date))   cls += ' today';
-        else if (isUnavailable(date)) cls += ' unavailable';
-        else                      cls += ' available';
+        if (isPast(date))          cls += ' past';
+        else if (isToday(date))    cls += ' today';
+        else if (isAvailable(date)) cls += ' available';
+        else                        cls += ' unavailable';
         html += `<div class="${cls}">${d}</div>`;
       }
 
@@ -1088,7 +1130,6 @@
         const d = new Date(today.getFullYear(), today.getMonth() + offset + i, 1);
         html += renderMonth(d.getFullYear(), d.getMonth());
       }
-      // Add navigation
       html = `
         <div style="grid-column:1/-1;display:flex;gap:12px;align-items:center;margin-bottom:8px;">
           <button class="cal-nav-btn" onclick="changeOffset(-2)">← Previous</button>
@@ -1107,16 +1148,42 @@
     fetch('availability.json')
       .then(r => r.json())
       .then(data => {
-        unavailableRanges = (data.unavailable || []).map(r => ({
+        availableRanges = (data.available || []).map(r => ({
           from: parseDate(r.from),
           to:   parseDate(r.to)
         }));
         renderCalendars(0);
       })
       .catch(() => {
-        // Graceful fallback if JSON not found
         renderCalendars(0);
       });
+
+    // Apartment photo carousel
+    (function() {
+      const track  = document.getElementById('apt-track');
+      const imgs   = track.querySelectorAll('img');
+      const dotsEl = document.getElementById('apt-dots');
+      const prev   = document.getElementById('apt-prev');
+      const next   = document.getElementById('apt-next');
+      let cur = 0;
+
+      imgs.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.className = 'apt-dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsEl.appendChild(d);
+      });
+
+      function goTo(n) {
+        cur = (n + imgs.length) % imgs.length;
+        track.style.transform = `translateX(-${cur * 100}%)`;
+        dotsEl.querySelectorAll('.apt-dot').forEach((d, i) =>
+          d.classList.toggle('active', i === cur));
+      }
+
+      prev.addEventListener('click', () => goTo(cur - 1));
+      next.addEventListener('click', () => goTo(cur + 1));
+    })();
 
     // Testimonials carousel
     (function() {
