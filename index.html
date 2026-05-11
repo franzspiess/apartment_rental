@@ -476,6 +476,9 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
+    @media (max-width: 700px) {
+      .testimonials-grid { grid-template-columns: 1fr; }
+    }
     .testimonial-card {
       padding: 32px;
       border: 1px solid var(--border);
@@ -484,7 +487,7 @@
       position: relative;
       display: none;
     }
-    .testimonial-card.visible { display: block; }
+    .testimonial-card.visible { display: flex; flex-direction: column; }
     .testimonial-card::before {
       content: '\201C';
       font-family: var(--font-display);
@@ -499,15 +502,44 @@
     .testimonial-stars,
     .testimonial-text,
     .testimonial-author { position: relative; z-index: 1; }
+    .testimonial-text-wrap {
+      position: relative;
+      margin-bottom: 8px;
+      padding-top: 24px;
+    }
     .testimonial-text {
       font-size: 0.95rem;
       line-height: 1.7;
       color: var(--ink-light);
-      margin-bottom: 20px;
-      padding-top: 24px;
+      max-height: 9em;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
     }
+    .testimonial-text.expanded { max-height: 600px; }
+    .testimonial-fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2.5em;
+      background: linear-gradient(transparent, var(--warm-white));
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .testimonial-fade.hidden { opacity: 0; }
+    .read-more-btn {
+      background: none; border: none;
+      color: var(--terra);
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 4px 0 12px;
+      font-family: var(--font-body);
+      letter-spacing: 0.04em;
+      display: none;
+      text-align: left;
+    }
+    .read-more-btn.visible { display: block; }
     .testimonial-author {
       display: flex; align-items: center; gap: 10px;
+      margin-top: auto;
     }
     .testimonial-stars {
       color: var(--gold);
@@ -971,6 +1003,7 @@
 
       <div class="ratings-summary">
         <div class="rating-stat"><span class="score">4.92</span><span class="label">Overall</span></div>
+        <div class="rating-stat"><span class="score">4.8</span><span class="label">Cleanliness</span></div>
         <div class="rating-stat"><span class="score">5.0</span><span class="label">Check-in</span></div>
         <div class="rating-stat"><span class="score">5.0</span><span class="label">Communication</span></div>
         <div class="rating-stat"><span class="score">5.0</span><span class="label">Accuracy</span></div>
@@ -980,6 +1013,30 @@
 
       <div class="testimonials-carousel">
         <div class="testimonials-grid" id="testimonials-grid">
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">Our stay with Franz was truly outstanding. He was an incredibly kind and helpful host, always available and thorough with answers. The apartment was spotlessly clean — and although not directly in the city centre, the location was perfect. Lines 33 and 5 take you to the heart of the city in no time, and it's easily accessible from the airport. What stood out most was that you could immediately tell it was Franz's own home: personal and cosy, unlike many Airbnbs that feel impersonal. In January it was wonderfully heated. We had plenty of space, felt completely at ease, and can highly recommend Franz and his apartment.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">M</div>
+              <div>
+                <div class="testimonial-name">Mehmet Mert</div>
+                <div class="testimonial-origin">January 2025</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">We stayed a full month and the apartment was exactly what we needed. The kitchen was fully stocked for cooking meals. Lots of grocery stores within a 10-minute walk, plus a cute ice cream shop, café, and pizzeria right on the square. Rail stations at the square made the city centre reachable in 15–20 minutes. We absolutely loved our stay — Franz was super helpful with everything.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">R</div>
+              <div>
+                <div class="testimonial-name">🇺🇸 Rachel</div>
+                <div class="testimonial-origin">United States · May 2025</div>
+              </div>
+            </div>
+          </div>
 
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
@@ -1019,24 +1076,24 @@
 
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">We had a great stay at Franz's apartment. Transport into the city centre is fantastic — regular, fast, inexpensive — but it's also possible to go by foot along the canal, which we enjoyed. The apartment is spacious and clean, and the block is quiet. There's a great pizzeria right next to the flat and a cute café on the square outside. Franz is friendly and on hand to help via message.</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">L</div>
-              <div>
-                <div class="testimonial-name">🇬🇧 Louise</div>
-                <div class="testimonial-origin">United Kingdom · November 2025</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
             <p class="testimonial-text">A quiet and comfortable space in a non-touristy part of Vienna. Very easy to get to all parts of the city by tram or subway, with several pleasant cafés and good restaurants a short walk away. The Augarten — a fantastic park — is five minutes away. I was there for a full week and used the kitchen regularly; it had everything needed. Really made my stay enjoyable.</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar">W</div>
               <div>
                 <div class="testimonial-name">🇬🇧 William</div>
                 <div class="testimonial-origin">United Kingdom · October 2025</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">We had a great stay at Franz's apartment. Transport into the city centre is fantastic — regular, fast, inexpensive — but it's also possible to go by foot along the canal, which we enjoyed. The apartment is spacious and clean, and the block is quiet. There's a great pizzeria right next to the flat and a cute café on the square outside. Franz is friendly and on hand to help via message.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">L</div>
+              <div>
+                <div class="testimonial-name">🇬🇧 Louise</div>
+                <div class="testimonial-origin">United Kingdom · November 2025</div>
               </div>
             </div>
           </div>
@@ -1055,36 +1112,12 @@
 
           <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">We stayed a full month and the apartment was exactly what we needed. The kitchen was fully stocked for cooking meals. Lots of grocery stores within a 10-minute walk, plus a cute ice cream shop, café, and pizzeria right on the square. Rail stations at the square made the city centre reachable in 15–20 minutes. We absolutely loved our stay — Franz was super helpful with everything.</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">R</div>
-              <div>
-                <div class="testimonial-name">🇺🇸 Rachel</div>
-                <div class="testimonial-origin">United States · May 2025</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
             <p class="testimonial-text">The stay was great. The apartment is in a good location, in a nice part of the city with everything easily accessible. Well maintained and clean — there is everything you need to live. The bed is very comfortable. Franz responds quickly and is helpful. We had a great time.</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar">P</div>
               <div>
                 <div class="testimonial-name">🇩🇪 Patricia</div>
                 <div class="testimonial-origin">Germany · April 2025</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">Our stay with Franz was truly outstanding. He was an incredibly kind and helpful host, always available and thorough with answers. The apartment was spotlessly clean — and although not directly in the city centre, the location was perfect. Lines 33 and 5 take you to the heart of the city in no time, and it's easily accessible from the airport. What stood out most was that you could immediately tell it was Franz's own home: personal and cosy, unlike many Airbnbs that feel impersonal. In January it was wonderfully heated. We had plenty of space, felt completely at ease, and can highly recommend Franz and his apartment.</p>
-            <div class="testimonial-author">
-              <div class="testimonial-avatar">M</div>
-              <div>
-                <div class="testimonial-name">Mehmet Mert</div>
-                <div class="testimonial-origin">January 2025</div>
               </div>
             </div>
           </div>
@@ -1384,9 +1417,51 @@
       const dotsWrap = document.getElementById('carousel-dots');
       const prevBtn  = document.getElementById('prev-btn');
       const nextBtn  = document.getElementById('next-btn');
-      const PER_PAGE = window.innerWidth < 700 ? 1 : 3;
+      const PER_PAGE = window.innerWidth <= 700 ? 1 : 3;
       let page = 0;
       const pages = Math.ceil(cards.length / PER_PAGE);
+
+      // Inject read-more structure into every card
+      cards.forEach(card => {
+        const p = card.querySelector('.testimonial-text');
+        if (!p) return;
+        // Wrap in text-wrap div
+        const wrap = document.createElement('div');
+        wrap.className = 'testimonial-text-wrap';
+        p.parentNode.insertBefore(wrap, p);
+        wrap.appendChild(p);
+        // Add fade overlay
+        const fade = document.createElement('div');
+        fade.className = 'testimonial-fade';
+        wrap.appendChild(fade);
+        // Add read-more button
+        const btn = document.createElement('button');
+        btn.className = 'read-more-btn';
+        btn.textContent = 'Read more +';
+        wrap.after(btn);
+        btn.addEventListener('click', () => {
+          const expanded = p.classList.toggle('expanded');
+          fade.classList.toggle('hidden', expanded);
+          btn.textContent = expanded ? 'Show less −' : 'Read more +';
+        });
+      });
+
+      // Check overflow and show/hide read-more buttons
+      function initReadMore() {
+        cards.forEach(card => {
+          const p   = card.querySelector('.testimonial-text');
+          const btn = card.querySelector('.read-more-btn');
+          const fade = card.querySelector('.testimonial-fade');
+          if (!p || !btn) return;
+          // Temporarily make visible to measure
+          const wasHidden = !card.classList.contains('visible');
+          if (wasHidden) { card.style.display = 'flex'; }
+          const overflows = p.scrollHeight > p.clientHeight + 4;
+          if (wasHidden) { card.style.display = ''; }
+          btn.classList.toggle('visible', overflows);
+          if (fade) fade.classList.toggle('hidden', !overflows);
+        });
+      }
 
       // Build dots
       for (let i = 0; i < pages; i++) {
@@ -1411,6 +1486,8 @@
       prevBtn.addEventListener('click', () => { if (page > 0) goTo(page - 1); });
       nextBtn.addEventListener('click', () => { if (page < pages - 1) goTo(page + 1); });
       goTo(0);
+      // Run after paint so heights are accurate
+      requestAnimationFrame(initReadMore);
     })();
 
 
