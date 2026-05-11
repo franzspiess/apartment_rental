@@ -340,16 +340,22 @@
       max-width: 600px;
       margin-bottom: 56px;
     }
+    .neighbourhood-carousel { position: relative; }
     .neighbourhood-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2px;
     }
+    @media (max-width: 700px) {
+      .neighbourhood-grid { grid-template-columns: 1fr; }
+    }
     .neighbourhood-card {
       aspect-ratio: 4/5;
       overflow: hidden;
       position: relative;
+      display: none;
     }
+    .neighbourhood-card.visible { display: block; }
     .neighbourhood-card img {
       width: 100%; height: 100%;
       object-fit: cover;
@@ -365,6 +371,26 @@
       font-size: 1.2rem;
       font-style: italic;
     }
+    .hood-nav {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; margin-top: 16px;
+    }
+    .hood-btn {
+      background: none; border: 1px solid var(--border);
+      width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; font-size: 0.9rem; color: var(--ink-light);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .hood-btn:hover { border-color: var(--terra); color: var(--terra); }
+    .hood-btn:disabled { opacity: 0.3; cursor: default; }
+    .hood-dots { display: flex; gap: 6px; }
+    .hood-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border); cursor: pointer;
+      transition: background 0.2s;
+    }
+    .hood-dot.active { background: var(--terra); }
     .neighbourhood-facts {
       margin-top: 48px;
       display: grid;
@@ -511,11 +537,18 @@
       font-size: 0.95rem;
       line-height: 1.7;
       color: var(--ink-light);
+<<<<<<< Updated upstream
       max-height: 9em;
       overflow: hidden;
       transition: max-height 0.3s ease;
     }
     .testimonial-text.expanded { max-height: 600px; }
+=======
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .testimonial-text.expanded { max-height: 800px !important; }
+>>>>>>> Stashed changes
     .testimonial-fade {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -803,14 +836,12 @@
       .host-photo-wrap { max-width: 240px; }
       .contact-grid { grid-template-columns: 1fr; gap: 40px; }
       .calendars-wrap { grid-template-columns: 1fr; gap: 40px; }
-      .neighbourhood-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 600px) {
       .nav-links { display: none; }
       section { padding: 56px 0; }
       h1 { font-size: 2.4rem; }
       .form-row { grid-template-columns: 1fr; }
-      .neighbourhood-grid { grid-template-columns: 1fr; }
       .ratings-summary { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
@@ -940,18 +971,37 @@
         <h2>Proper Vienna — and the city centre is closer than you think</h2>
         <p>The 20th district is one of Vienna's most genuinely Viennese neighbourhoods — not a tourist zone, not a gentrified shell. You're on Wallensteinplatz, directly at the edge of the Augarten, with excellent connections to the whole city and the kind of street-level life that makes Vienna what it is.</p>
       </div>
-      <div class="neighbourhood-grid">
-        <div class="neighbourhood-card">
-          <img src="assets/augarten.jpg" alt="Augarten park Vienna" loading="lazy" />
-          <span class="neighbourhood-card-label">The Augarten</span>
+      <div class="neighbourhood-carousel">
+        <div class="neighbourhood-grid" id="hood-grid">
+          <div class="neighbourhood-card">
+            <img src="assets/augarten.jpg" alt="Augarten park Vienna" loading="lazy" />
+            <span class="neighbourhood-card-label">The Augarten</span>
+          </div>
+          <div class="neighbourhood-card">
+            <img src="assets/wallenstein1.jpg" alt="Wallensteinplatz square" loading="lazy" />
+            <span class="neighbourhood-card-label">Wallensteinplatz</span>
+          </div>
+          <div class="neighbourhood-card">
+            <img src="assets/hannovermarkt.jpg" alt="Hannovermarkt Vienna" loading="lazy" />
+            <span class="neighbourhood-card-label">Hannovermarkt</span>
+          </div>
+          <div class="neighbourhood-card">
+            <img src="assets/donaukanal.jpg" alt="Donaukanal Vienna" loading="lazy" />
+            <span class="neighbourhood-card-label">Donaukanal</span>
+          </div>
+          <div class="neighbourhood-card">
+            <img src="assets/wien-linie-05-20-wallensteinplatz-a.jpeg" alt="Local tram stop" loading="lazy" />
+            <span class="neighbourhood-card-label">At the Door</span>
+          </div>
+          <div class="neighbourhood-card">
+            <img src="assets/wien-cityview-dusk.jpg" alt="Vienna city view at dusk" loading="lazy" />
+            <span class="neighbourhood-card-label">City Centre</span>
+          </div>
         </div>
-        <div class="neighbourhood-card">
-          <img src="assets/wien-linie-05-20-wallensteinplatz-a.jpeg" alt="Wallensteinplatz tram stop" loading="lazy" />
-          <span class="neighbourhood-card-label">Wallensteinplatz</span>
-        </div>
-        <div class="neighbourhood-card">
-          <img src="assets/wien-cityview-dusk.jpg" alt="Vienna city view at dusk" loading="lazy" />
-          <span class="neighbourhood-card-label">City Centre</span>
+        <div class="hood-nav">
+          <button class="hood-btn" id="hood-prev" aria-label="Previous">←</button>
+          <div class="hood-dots" id="hood-dots"></div>
+          <button class="hood-btn" id="hood-next" aria-label="Next">→</button>
         </div>
       </div>
       <div class="neighbourhood-facts">
@@ -1384,6 +1434,39 @@
         renderCalendars(0);
       });
 
+    // Neighbourhood carousel
+    (function() {
+      const cards    = Array.from(document.querySelectorAll('#hood-grid .neighbourhood-card'));
+      const dotsWrap = document.getElementById('hood-dots');
+      const prevBtn  = document.getElementById('hood-prev');
+      const nextBtn  = document.getElementById('hood-next');
+      const PER_PAGE = window.innerWidth <= 700 ? 1 : 3;
+      let page = 0;
+      const pages = Math.ceil(cards.length / PER_PAGE);
+
+      for (let i = 0; i < pages; i++) {
+        const d = document.createElement('span');
+        d.className = 'hood-dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(d);
+      }
+
+      function goTo(p) {
+        page = p;
+        cards.forEach((c, i) => {
+          c.classList.toggle('visible', i >= page * PER_PAGE && i < (page + 1) * PER_PAGE);
+        });
+        dotsWrap.querySelectorAll('.hood-dot').forEach((d, i) =>
+          d.classList.toggle('active', i === page));
+        prevBtn.disabled = page === 0;
+        nextBtn.disabled = page === pages - 1;
+      }
+
+      prevBtn.addEventListener('click', () => { if (page > 0) goTo(page - 1); });
+      nextBtn.addEventListener('click', () => { if (page < pages - 1) goTo(page + 1); });
+      goTo(0);
+    })();
+
     // Apartment photo carousel
     (function() {
       const track  = document.getElementById('apt-track');
@@ -1441,12 +1524,18 @@
         wrap.after(btn);
         btn.addEventListener('click', () => {
           const expanded = p.classList.toggle('expanded');
+<<<<<<< Updated upstream
           fade.classList.toggle('hidden', expanded);
+=======
+          p.style.maxHeight = expanded ? '800px' : TRUNCATE_PX + 'px';
+          if (fade) fade.classList.toggle('hidden', expanded);
+>>>>>>> Stashed changes
           btn.textContent = expanded ? 'Show less −' : 'Read more +';
         });
       });
 
       // Check overflow and show/hide read-more buttons
+<<<<<<< Updated upstream
       function initReadMore() {
         cards.forEach(card => {
           const p   = card.querySelector('.testimonial-text');
@@ -1460,6 +1549,30 @@
           if (wasHidden) { card.style.display = ''; }
           btn.classList.toggle('visible', overflows);
           if (fade) fade.classList.toggle('hidden', !overflows);
+=======
+      const TRUNCATE_PX = 260; // only truncate cards taller than this
+      function initReadMore() {
+        cards.forEach(card => {
+          const p    = card.querySelector('.testimonial-text');
+          const btn  = card.querySelector('.read-more-btn');
+          const fade = card.querySelector('.testimonial-fade');
+          if (!p || !btn) return;
+          // Measure natural height — temporarily show if hidden
+          const wasHidden = !card.classList.contains('visible');
+          if (wasHidden) { card.style.cssText = 'display:flex;visibility:hidden;position:absolute'; }
+          p.style.maxHeight = 'none';
+          const natural = p.scrollHeight;
+          if (wasHidden) { card.style.cssText = ''; }
+          if (natural > TRUNCATE_PX) {
+            p.style.maxHeight = TRUNCATE_PX + 'px';
+            btn.classList.add('visible');
+            if (fade) fade.classList.remove('hidden');
+          } else {
+            p.style.maxHeight = 'none';
+            btn.classList.remove('visible');
+            if (fade) fade.classList.add('hidden');
+          }
+>>>>>>> Stashed changes
         });
       }
 
