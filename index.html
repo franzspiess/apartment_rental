@@ -537,18 +537,10 @@
       font-size: 0.95rem;
       line-height: 1.7;
       color: var(--ink-light);
-<<<<<<< Updated upstream
-      max-height: 9em;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-    .testimonial-text.expanded { max-height: 600px; }
-=======
       overflow: hidden;
       transition: max-height 0.35s ease;
     }
     .testimonial-text.expanded { max-height: 800px !important; }
->>>>>>> Stashed changes
     .testimonial-fade {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -1524,32 +1516,13 @@
         wrap.after(btn);
         btn.addEventListener('click', () => {
           const expanded = p.classList.toggle('expanded');
-<<<<<<< Updated upstream
-          fade.classList.toggle('hidden', expanded);
-=======
           p.style.maxHeight = expanded ? '800px' : TRUNCATE_PX + 'px';
           if (fade) fade.classList.toggle('hidden', expanded);
->>>>>>> Stashed changes
           btn.textContent = expanded ? 'Show less −' : 'Read more +';
         });
       });
 
       // Check overflow and show/hide read-more buttons
-<<<<<<< Updated upstream
-      function initReadMore() {
-        cards.forEach(card => {
-          const p   = card.querySelector('.testimonial-text');
-          const btn = card.querySelector('.read-more-btn');
-          const fade = card.querySelector('.testimonial-fade');
-          if (!p || !btn) return;
-          // Temporarily make visible to measure
-          const wasHidden = !card.classList.contains('visible');
-          if (wasHidden) { card.style.display = 'flex'; }
-          const overflows = p.scrollHeight > p.clientHeight + 4;
-          if (wasHidden) { card.style.display = ''; }
-          btn.classList.toggle('visible', overflows);
-          if (fade) fade.classList.toggle('hidden', !overflows);
-=======
       const TRUNCATE_PX = 260; // only truncate cards taller than this
       function initReadMore() {
         cards.forEach(card => {
@@ -1572,7 +1545,6 @@
             btn.classList.remove('visible');
             if (fade) fade.classList.add('hidden');
           }
->>>>>>> Stashed changes
         });
       }
 
